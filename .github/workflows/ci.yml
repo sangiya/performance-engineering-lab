@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build service module
+        run: mvn -B -pl service package -q
+
+      - name: Run unit tests
+        run: mvn -B -pl service test
+
+      - name: Build benchmark module (compile + shade only)
+        run: mvn -B -pl benchmark package -DskipTests -q
+
+      - name: JMH smoke run (1 fork, 1 warmup, 1 measurement)
+        run: |
+          java -jar benchmark/target/benchmarks.jar \
+            -f 1 -wi 1 -i 1 -r 1s -w 1s \
+            OrderCalculationBenchmark

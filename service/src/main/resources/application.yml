@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: performance-engineering-lab
+  datasource:
+    url: jdbc:h2:mem:perfdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+server:
+  port: 8080
+
+perf:
+  artificial-delay-ms: ${ARTIFICIAL_DELAY_MS:0}
